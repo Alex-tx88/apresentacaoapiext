@@ -1,0 +1,2458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rede Subterrânea — Apresentação APIEXT III | UNINASSAU Salvador</title>
+
+  <style>
+    /* =========================================================================
+       DESIGN TOKENS — ESTÉTICA DARK TECH URBANA (100% OFFLINE)
+       ========================================================================= */
+    :root {
+      --bg-deep: #07111f;
+      --bg-surface: #0b192d;
+      --bg-card: rgba(13, 27, 48, 0.82);
+      --bg-card-solid: #0d1b30;
+      --border-subtle: rgba(148, 163, 184, 0.16);
+      --border-cyan: rgba(0, 212, 255, 0.38);
+
+      --cyan: #00d4ff;
+      --blue: #3b82f6;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+
+      --text-main: #f8fafc;
+      --text-soft: #cbd5e1;
+      --text-muted: #94a3b8;
+
+      --font-display: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Fundo técnico com gradiente radial e grade blueprint discreta */
+    body {
+      display: flex;
+      flex-direction: column;
+      background-image:
+        radial-gradient(circle at 12% 14%, rgba(0, 212, 255, 0.11), transparent 42%),
+        radial-gradient(circle at 88% 82%, rgba(16, 185, 129, 0.08), transparent 42%),
+        linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+    }
+
+    /* =========================================================================
+       PALCO PRINCIPAL (100VH SEM ROLAGEM DESNECESSÁRIA)
+       ========================================================================= */
+    .stage {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 18px 28px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .slide.active {
+      display: flex;
+      animation: slideIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cabeçalho de cada slide */
+    .slide-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .kicker {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      font-weight: 700;
+      display: block;
+    }
+
+    .slide-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.45rem, 2.5vw, 2.15rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.12;
+      margin-top: 2px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, var(--cyan), #38bdf8, var(--emerald));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Cards e badges reutilizáveis */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(0, 212, 255, 0.35);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: 1px solid var(--border-subtle);
+      background: rgba(11, 25, 45, 0.9);
+      color: var(--text-soft);
+    }
+
+    .badge-cyan { border-color: rgba(0, 212, 255, 0.45); background: rgba(0, 212, 255, 0.12); color: #38e8ff; }
+    .badge-blue { border-color: rgba(59, 130, 246, 0.45); background: rgba(59, 130, 246, 0.12); color: #60a5fa; }
+    .badge-emerald { border-color: rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.12); color: #34d399; }
+    .badge-amber { border-color: rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.12); color: #fbbf24; }
+    .badge-red { border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.16); color: #f87171; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+
+    .icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+
+    .card-h3 {
+      font-family: var(--font-display);
+      font-size: 1.02rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--text-main);
+    }
+
+    .card-p {
+      font-size: 0.86rem;
+      color: var(--text-soft);
+      line-height: 1.48;
+    }
+
+    .pill-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 10px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(11, 25, 45, 0.72);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* =========================================================================
+       SLIDE 1 — CAPA
+       ========================================================================= */
+    .hero-wrap {
+      text-align: center;
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .hero-emblem {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      display: grid;
+      place-items: center;
+      color: #04101d;
+      box-shadow: 0 8px 28px rgba(0, 212, 255, 0.3);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 5.8vw, 4.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.04;
+    }
+
+    .hero-sub {
+      font-size: clamp(1.05rem, 1.8vw, 1.38rem);
+      color: var(--text-soft);
+      font-weight: 500;
+      max-width: 760px;
+      line-height: 1.38;
+    }
+
+    .hero-credits {
+      margin-top: 8px;
+      width: 100%;
+      padding: 18px 22px;
+      border-radius: var(--radius-lg);
+      background: rgba(13, 27, 48, 0.82);
+      border: 1px solid var(--border-cyan);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-soft);
+    }
+
+    .hero-credits-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px 14px;
+    }
+
+    .hero-credits strong { color: var(--text-main); }
+    .sep-dot { color: var(--cyan); font-weight: 800; }
+
+    /* =========================================================================
+       SLIDE 2 — KPIs & CONTEXTO DE SALVADOR
+       ========================================================================= */
+    .kpi-card {
+      text-align: center;
+      padding: 14px 12px;
+    }
+
+    .kpi-big {
+      font-family: var(--font-mono);
+      font-size: clamp(1.45rem, 2.5vw, 2.15rem);
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .kpi-sub {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .compare-box {
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    /* =========================================================================
+       SLIDE 3 — A SOLUÇÃO & PÚBLICO-ALVO
+       ========================================================================= */
+    .pv-chain {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(90deg, rgba(0, 212, 255, 0.08), rgba(16, 185, 129, 0.07));
+      border: 1px solid var(--border-cyan);
+    }
+
+    .pv-node {
+      background: rgba(7, 17, 31, 0.86);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .pv-code {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+
+    .pv-desc {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+
+    .chain-arrow {
+      font-family: var(--font-mono);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--cyan);
+      text-align: center;
+    }
+
+    .org-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    /* =========================================================================
+       SLIDE 4 — SIMULADOR HIDRÁULICO AO VIVO
+       ========================================================================= */
+    .sim-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .sim-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 13px;
+      border-radius: 10px;
+      background: rgba(11, 25, 45, 0.95);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-soft);
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .sim-btn .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .sim-btn.active-normal { border-color: var(--emerald); background: rgba(16, 185, 129, 0.16); color: #6ee7b7; }
+    .sim-btn.active-alerta { border-color: var(--amber); background: rgba(245, 158, 11, 0.18); color: #fcd34d; }
+    .sim-btn.active-critico { border-color: var(--red); background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+
+    .sim-layout {
+      display: grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .sim-svg-box {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sim-svg {
+      width: 100%;
+      height: auto;
+      border-radius: 11px;
+      background: #040b16;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin: 10px 0;
+    }
+
+    .metric-box {
+      background: rgba(7, 17, 31, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 9px 11px;
+    }
+
+    .metric-label {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .metric-val {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      color: #04101d;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s ease, filter 0.2s ease;
+    }
+
+    .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+    @keyframes flowDash {
+      from { stroke-dashoffset: 48; }
+      to { stroke-dashoffset: 0; }
+    }
+    .water-fast { stroke-dasharray: 12 12; animation: flowDash 0.72s linear infinite; }
+    .water-mid { stroke-dasharray: 10 14; animation: flowDash 1.65s linear infinite; }
+    .water-slow { stroke-dasharray: 6 18; animation: flowDash 3.6s linear infinite; }
+    .svg-smooth { transition: all 0.55s ease; }
+
+    /* =========================================================================
+       SLIDE 5 — VALIDAÇÃO EM CAMPO & VOZ DA COMUNIDADE
+       LAYOUT RIGOROSAMENTE EM 2 COLUNAS LADO A LADO (44% TEXTO | 56% CARROSSEL)
+       ========================================================================= */
+    .field-grid {
+      display: grid;
+      grid-template-columns: 44% 56%;
+      gap: 24px;
+      align-items: stretch;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      max-height: calc(100vh - 175px);
+    }
+
+    .field-col-left {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .quote-card {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(13, 27, 48, 0.92));
+      border: 1px solid rgba(0, 212, 255, 0.34);
+      border-left: 4px solid var(--cyan);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .quote-text {
+      font-size: 0.92rem;
+      font-style: italic;
+      color: var(--text-main);
+      line-height: 1.48;
+      font-weight: 500;
+    }
+
+    .quote-author {
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.69rem;
+      color: var(--cyan);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .insight-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 13px 15px;
+    }
+
+    .insight-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .insight-text {
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      line-height: 1.46;
+    }
+
+    /* COLUNA DIREITA: CARROSSEL HORIZONTAL INTERATIVO */
+    .field-col-right {
+      min-width: 0;
+      min-height: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .field-col-right.drag-over {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
+      background: rgba(0, 212, 255, 0.09);
+    }
+
+    .carousel-viewport {
+      position: relative;
+      flex: 1;
+      min-height: 240px;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #040b16;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .carousel-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
+    .carousel-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: zoom-in;
+      display: none;
+    }
+
+    .carousel-slide.has-photo img {
+      display: block;
+    }
+
+    .carousel-placeholder {
+      width: 100%;
+      height: 100%;
+      padding: 24px 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 10px;
+      cursor: pointer;
+      background:
+        radial-gradient(circle at center, rgba(0, 212, 255, 0.09), transparent 68%),
+        linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 24px 24px, 24px 24px;
+    }
+
+    .carousel-slide.has-photo .carousel-placeholder {
+      display: none;
+    }
+
+    /* Controles sobrepostos do carrossel */
+    .carousel-badge-top {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 5;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--cyan);
+      background: rgba(7, 17, 31, 0.84);
+      border: 1px solid var(--border-cyan);
+      backdrop-filter: blur(6px);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .carousel-btn-expand {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(7, 17, 31, 0.84);
+      border: 1px solid rgba(148, 163, 184, 0.32);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: all 0.2s ease;
+    }
+
+    .carousel-btn-expand:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .carousel-btn-expand.hidden {
+      display: none;
+    }
+
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(7, 17, 31, 0.78);
+      color: #ffffff;
+      font-size: 1.45rem;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: all 0.2s ease;
+    }
+
+    .carousel-arrow:hover {
+      background: var(--cyan);
+      color: #04101d;
+      border-color: var(--cyan);
+    }
+
+    .carousel-arrow.prev { left: 10px; }
+    .carousel-arrow.next { right: 10px; }
+
+    .carousel-caption-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 4;
+      padding: 18px 14px 11px;
+      background: linear-gradient(transparent, rgba(4, 11, 22, 0.94) 45%);
+      color: var(--text-main);
+      font-size: 0.84rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    /* Barra compacta inferior do carrossel */
+    .carousel-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .carousel-dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .c-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      border: none;
+      background: rgba(148, 163, 184, 0.35);
+      cursor: pointer;
+      transition: all 0.22s ease;
+    }
+
+    .c-dot.active {
+      width: 24px;
+      background: var(--cyan);
+      box-shadow: 0 0 8px rgba(0, 212, 255, 0.55);
+    }
+
+    .carousel-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-c-ctrl {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: rgba(7, 17, 31, 0.9);
+      color: var(--text-soft);
+      transition: all 0.2s ease;
+    }
+
+    .btn-c-ctrl:hover, .btn-c-ctrl.active {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(0, 212, 255, 0.12);
+    }
+
+    .btn-c-upload {
+      border-color: rgba(0, 212, 255, 0.45);
+      background: rgba(0, 212, 255, 0.14);
+      color: #38e8ff;
+    }
+
+    .btn-c-upload:hover {
+      background: var(--cyan);
+      color: #04101d;
+    }
+
+    /* =========================================================================
+       SLIDE 6 — ARQUITETURA DE BIG DATA EM TEMPO REAL
+       ========================================================================= */
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .pipe-step {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-top: 3px solid var(--cyan);
+      border-radius: 12px;
+      padding: 13px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .pipe-num {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 800;
+      color: var(--cyan);
+      letter-spacing: 0.06em;
+    }
+
+    .pipe-title {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .pipe-desc {
+      font-size: 0.76rem;
+      color: var(--text-soft);
+      line-height: 1.4;
+    }
+
+    /* =========================================================================
+       SLIDE 7 — SEGURANÇA & PRIVACIDADE
+       ========================================================================= */
+    .sec-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    /* =========================================================================
+       SLIDE 8 — MVP, CRONOGRAMA & PRÓXIMOS PASSOS
+       ========================================================================= */
+    .price-highlight {
+      font-family: var(--font-mono);
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #34d399;
+      margin: 4px 0 8px;
+    }
+
+    .clean-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .clean-list li {
+      font-size: 0.84rem;
+      color: var(--text-soft);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.38;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .t-step {
+      background: rgba(13, 27, 48, 0.78);
+      border: 1px solid var(--border-subtle);
+      border-top: 3px solid var(--cyan);
+      border-radius: 12px;
+      padding: 11px 13px;
+    }
+
+    .t-month {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+
+    .t-desc {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      margin-top: 4px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    /* =========================================================================
+       SLIDE 9 — ENCERRAMENTO & INTERDISCIPLINARIDADE
+       ========================================================================= */
+    .closing-hero {
+      text-align: center;
+      padding: 20px 24px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.11), rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+      border: 1px solid var(--border-cyan);
+    }
+
+    .closing-quote {
+      font-family: var(--font-display);
+      font-size: clamp(1.35rem, 2.5vw, 2.05rem);
+      font-weight: 800;
+      line-height: 1.24;
+      max-width: 860px;
+      margin: 0 auto 8px;
+    }
+
+    /* =========================================================================
+       BARRA INFERIOR DISCRETA (PROGRESSO, CONTADOR E CONTROLES)
+       ========================================================================= */
+    .bottom-bar {
+      flex-shrink: 0;
+      background: rgba(5, 12, 24, 0.94);
+      border-top: 1px solid var(--border-subtle);
+      backdrop-filter: blur(10px);
+      z-index: 40;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(148, 163, 184, 0.14);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 11.11%;
+      background: linear-gradient(90deg, var(--cyan), var(--blue), var(--emerald));
+      transition: width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.55);
+    }
+
+    .bottom-inner {
+      padding: 8px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .bottom-left, .bottom-center, .bottom-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-mini {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      color: var(--text-soft);
+    }
+
+    .pill-counter {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: var(--cyan);
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid var(--border-cyan);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 13px;
+      border-radius: 9px;
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
+    .nav-btn.primary { background: var(--cyan); color: #04101d; border-color: var(--cyan); }
+    .nav-btn.primary:hover:not(:disabled) { filter: brightness(1.08); color: #04101d; }
+    .nav-btn:disabled { opacity: 0.32; cursor: not-allowed; }
+
+    .tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      background: rgba(11, 25, 45, 0.9);
+      color: var(--text-soft);
+      transition: all 0.2s ease;
+    }
+
+    .tool-btn:hover, .tool-btn.active-toggle {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(0, 212, 255, 0.12);
+    }
+
+    /* =========================================================================
+       NOTAS DO APRESENTADOR, MODAIS & LIGHTBOX
+       ========================================================================= */
+    .notes-panel {
+      position: fixed;
+      bottom: 60px;
+      right: 20px;
+      width: min(440px, calc(100vw - 32px));
+      background: rgba(7, 17, 31, 0.97);
+      border: 1px solid var(--cyan);
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.74);
+      z-index: 70;
+      display: none;
+    }
+    .notes-panel.open { display: block; }
+
+    .notes-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .notes-body {
+      font-size: 0.82rem;
+      line-height: 1.54;
+      color: var(--text-soft);
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 8, 18, 0.88);
+      backdrop-filter: blur(6px);
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .overlay.open { display: flex; }
+
+    .modal-box {
+      background: #0b192d;
+      border: 1px solid var(--border-cyan);
+      border-radius: 18px;
+      padding: 20px;
+      width: min(480px, 100%);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.78);
+    }
+
+    .modal-list {
+      max-height: 60vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 14px 0;
+    }
+
+    .index-item {
+      width: 100%;
+      text-align: left;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: rgba(13, 27, 48, 0.65);
+      color: var(--text-soft);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.18s ease;
+    }
+
+    .index-item:hover { border-color: rgba(0, 212, 255, 0.4); color: var(--text-main); }
+    .index-item.active {
+      background: rgba(0, 212, 255, 0.14);
+      border-color: var(--cyan);
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    .modal-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      background: rgba(7, 17, 31, 0.9);
+      border: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      margin-bottom: 8px;
+    }
+
+    /* Lightbox Tela Cheia */
+    .lightbox-wrap {
+      max-width: min(1080px, 94vw);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 76vh;
+      border-radius: 14px;
+      border: 1px solid var(--border-cyan);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+      object-fit: contain;
+      background: #040b16;
+    }
+
+    .lightbox-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(11, 25, 45, 0.96);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+
+    /* Toast discreto */
+    .toast {
+      position: fixed;
+      top: 18px;
+      right: 22px;
+      background: #0a2234;
+      border: 1px solid var(--emerald);
+      color: #a7f3d0;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+      transition: all 0.25s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* =========================================================================
+       RESPONSIVIDADE (SLIDE 5 SÓ EMPILHA EM TELAS MUITO ESTREITAS < 680px)
+       ========================================================================= */
+    @media (max-width: 1024px) {
+      .pipeline-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .sim-layout { grid-template-columns: 1.35fr 1fr; }
+    }
+
+    @media (max-width: 679px) {
+      .stage { padding: 12px; overflow-y: auto; align-items: flex-start; }
+      .slide { height: auto; justify-content: flex-start; }
+      .field-grid { grid-template-columns: 1fr; max-height: none; }
+      .carousel-viewport { min-height: 240px; }
+      .grid-2, .grid-3, .grid-4, .sim-layout, .pipeline-grid, .timeline-row { grid-template-columns: 1fr; }
+      .pv-chain { grid-template-columns: 1fr; }
+      .chain-arrow { transform: rotate(90deg); }
+      .hide-sm { display: none; }
+      .bottom-inner { padding: 8px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toast de notificações -->
+  <div id="toast" class="toast"></div>
+
+  <!-- =========================================================================
+       PALCO DOS 9 SLIDES
+       ========================================================================= -->
+  <main id="stage" class="stage">
+
+    <!-- ==================== SLIDE 1: CAPA ==================== -->
+    <section class="slide active" data-title="Capa">
+      <div class="hero-wrap">
+        <div class="hero-emblem" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 15a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4M7 15v-3m5 3V9m5 6v-4M4 6h16" />
+          </svg>
+        </div>
+
+        <span class="badge badge-cyan">UNINASSAU Salvador • APIEXT III • 6º Semestre (2026) • Sistemas de Informação</span>
+
+        <h1 class="hero-title">Rede <span class="gradient-text">Subterrânea</span></h1>
+
+        <p class="hero-sub">Sistema Inteligente de Monitoramento e Prevenção de Alagamentos Urbanos</p>
+
+        <div class="hero-credits">
+          <div class="hero-credits-row">
+            <span><strong>Equipe:</strong> Alex Teixeira • Davi Leal • Enoque Pereira • Matheus Flores • Thales Araújo</span>
+          </div>
+          <div class="hero-credits-row" style="font-size:0.82rem; color:var(--text-muted);">
+            <span><strong>Prof.</strong> Ramon Pinto Silva dos Santos Sales</span>
+            <span class="sep-dot">•</span>
+            <span><strong>Coord.</strong> Laiz Araújo</span>
+            <span class="sep-dot">•</span>
+            <span style="font-family:var(--font-mono); color:var(--cyan);">Salvador — BA • 2026</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 2: O PROBLEMA SILENCIOSO & CONTEXTO DE SALVADOR ==================== -->
+    <section class="slide" data-title="O Problema Silencioso & Contexto">
+      <div class="slide-head">
+        <div>
+          <span class="kicker">02 • Diagnóstico Urbano • Salvador — BA</span>
+          <h2 class="slide-title">O Problema Silencioso & Contexto de Salvador</h2>
+        </div>
+      </div>
+
+      <!-- 4 KPIs Socioeconômicos de Salvador -->
+      <div class="grid-4">
+        <div class="card kpi-card">
+          <div class="kpi-big" style="color:var(--cyan);">2,41M</div>
+          <div class="kpi-sub">Habitantes (IBGE 2022)</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="kpi-big" style="color:var(--blue);">3.486</div>
+          <div class="kpi-sub">Hab./km² • Alta Densidade</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="kpi-big" style="color:var(--emerald);">0,759</div>
+          <div class="kpi-sub">IDHM (Alto Desenvolvimento)</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="kpi-big" style="color:var(--amber);">R$ 31.724</div>
+          <div class="kpi-sub">PIB per Capita (2023)</div>
+        </div>
+      </div>
+
+      <!-- Obstruções Invisíveis + Reativa vs Preventiva -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="icon-box" style="background:rgba(239,68,68,0.14); color:var(--red);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <h3 class="card-h3">Obstruções Invisíveis no Subsolo</h3>
+          <p class="card-p">Acúmulo silencioso de resíduos sólidos nas galerias de micro e macrodrenagem da <strong>Av. Mário Leal Ferreira (Bonocô)</strong> e <strong>Av. Vasco da Gama</strong>. O bloqueio permanece oculto até a chuva forte provocar o transbordamento.</p>
+        </div>
+
+        <div class="card">
+          <div class="icon-box" style="background:rgba(0,212,255,0.14); color:var(--cyan);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </div>
+          <h3 class="card-h3">Mudança de Paradigma na Gestão</h3>
+          <div class="compare-row">
+            <div class="compare-box" style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.32);">
+              <strong style="color:#f87171;">Gestão Reativa</strong><br/>Atuação apenas quando a água já invadiu a pista e paralisou o trânsito.
+            </div>
+            <div class="compare-box" style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.34);">
+              <strong style="color:#34d399;">Gestão Preventiva</strong><br/>Detecção antecipada da retenção hidráulica com vias ainda livres.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ODS & Norma ANA -->
+      <div class="pill-bar">
+        <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); font-weight:700;">ALINHAMENTO:</span>
+        <span class="badge badge-cyan">ODS 6 • Água e Saneamento</span>
+        <span class="badge badge-blue">ODS 9 • Inovação e Infraestrutura</span>
+        <span class="badge badge-emerald">ODS 11 • Cidades Sustentáveis</span>
+        <span class="badge badge-amber">Norma ANA nº 12/2025</span>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 3: A SOLUÇÃO & PÚBLICO-ALVO ==================== -->
+    <section class="slide" data-title="A Solução & Público-Alvo">
+      <div class="slide-head">
+        <div>
+          <span class="kicker">03 • Proposta de Valor & Ecossistema</span>
+          <h2 class="slide-title">A Solução & Público-Alvo</h2>
+        </div>
+      </div>
+
+      <!-- Fluxo de Comparação PV-01 -> PV-02 -> PV-03 -->
+      <div class="pv-chain">
+        <div class="pv-node">
+          <div class="pv-code">PV-01 • Entrada</div>
+          <div class="pv-desc">Mede lâmina d'água e vazão inicial da galeria (ex.: 120 L/s).</div>
+        </div>
+        <div class="chain-arrow" aria-hidden="true">→</div>
+        <div class="pv-node" style="border-color:rgba(245,158,11,0.45);">
+          <div class="pv-code" style="color:var(--amber);">PV-02 • Intermediário</div>
+          <div class="pv-desc">Identifica elevação anômala de nível por retenção à jusante.</div>
+        </div>
+        <div class="chain-arrow" aria-hidden="true">→</div>
+        <div class="pv-node" style="border-color:rgba(16,185,129,0.45);">
+          <div class="pv-code" style="color:var(--emerald);">PV-03 • Saída</div>
+          <div class="pv-desc">Compara queda brusca de vazão e dispara alerta precoce.</div>
+        </div>
+      </div>
+
+      <!-- Público B2G + Beneficiários Finais -->
+      <div class="grid-2">
+        <div class="card" style="border-top:3px solid var(--cyan);">
+          <div class="icon-box" style="background:rgba(0,212,255,0.14); color:var(--cyan);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3 class="card-h3">Público-Alvo Operacional (B2G)</h3>
+          <p class="card-p">Órgãos municipais que operam o painel em tempo real para acionar equipes de limpeza e controle viário antes do alagamento atingir o asfalto.</p>
+          <div class="org-tags">
+            <span class="badge badge-cyan">CODESAL • Defesa Civil</span>
+            <span class="badge badge-blue">SUCOP • Manutenção</span>
+            <span class="badge badge-amber">TRANSALVADOR • Trânsito</span>
+          </div>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--emerald);">
+          <div class="icon-box" style="background:rgba(16,185,129,0.14); color:var(--emerald);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3 class="card-h3">Beneficiários Finais (População)</h3>
+          <p class="card-p"><strong>Moradores, motoristas, passageiros e pedestres</strong> de Salvador protegidos contra ilhamentos, danos materiais, riscos sanitários e interrupções na mobilidade urbana.</p>
+          <div class="org-tags">
+            <span class="badge badge-emerald">Segurança Viária</span>
+            <span class="badge badge-emerald">Vias Desobstruídas</span>
+            <span class="badge badge-emerald">Resposta em &lt; 10s</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 4: SIMULADOR HIDRÁULICO AO VIVO (AV. BONOCÔ) ==================== -->
+    <section class="slide" data-title="Simulador Hidráulico Ao Vivo">
+      <div class="slide-head" style="flex-wrap:wrap;">
+        <div>
+          <span class="kicker">04 • Demonstração Interativa • Av. Bonocô</span>
+          <h2 class="slide-title">Simulador Hidráulico Ao Vivo</h2>
+        </div>
+
+        <div class="sim-controls">
+          <button id="btnSimNormal" class="sim-btn active-normal" onclick="setSim('normal')">
+            <span class="dot" style="background:var(--emerald);"></span> Normal
+          </button>
+          <button id="btnSimAlerta" class="sim-btn" onclick="setSim('alerta')">
+            <span class="dot" style="background:var(--amber);"></span> Alerta
+          </button>
+          <button id="btnSimCritico" class="sim-btn" onclick="setSim('critico')">
+            <span class="dot" style="background:var(--red);"></span> Crítico — Queda 120 → 15 L/s
+          </button>
+        </div>
+      </div>
+
+      <div class="sim-layout">
+        <!-- SVG Corte Transversal -->
+        <div class="card sim-svg-box">
+          <div style="display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted); margin-bottom:6px;">
+            <span>CORTE TRANSVERSAL • AV. MÁRIO LEAL FERREIRA (BONOCÔ)</span>
+            <span style="color:var(--cyan);">● TELEMETRIA 500 ms</span>
+          </div>
+
+          <svg viewBox="0 0 800 292" class="sim-svg">
+            <defs>
+              <linearGradient id="gNorm" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.88" />
+                <stop offset="100%" stop-color="#2563eb" stop-opacity="0.96" />
+              </linearGradient>
+              <linearGradient id="gWarn" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.9" />
+                <stop offset="100%" stop-color="#d97706" stop-opacity="0.96" />
+              </linearGradient>
+              <linearGradient id="gCrit" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#f87171" stop-opacity="0.92" />
+                <stop offset="100%" stop-color="#b91c1c" stop-opacity="0.98" />
+              </linearGradient>
+            </defs>
+
+            <!-- Asfalto / Superfície -->
+            <rect x="0" y="0" width="800" height="48" fill="#07111f" />
+            <rect x="0" y="48" width="800" height="18" fill="#1e293b" />
+            <line x1="0" y1="57" x2="800" y2="57" stroke="#f59e0b" stroke-width="2" stroke-dasharray="18 14" opacity="0.65" />
+            <text x="16" y="34" fill="#94a3b8" font-family="monospace" font-size="11">PISTA — AV. BONOCÔ (VIA DESOBSTRUÍDA PARA AÇÃO PREVENTIVA)</text>
+
+            <!-- Subsolo -->
+            <rect x="0" y="66" width="800" height="226" fill="#091526" />
+
+            <!-- Galeria -->
+            <rect x="20" y="180" width="760" height="72" rx="6" fill="#0f1f36" stroke="#334155" stroke-width="2" />
+
+            <!-- Água na galeria -->
+            <rect id="svgPipeL" x="22" y="220" width="465" height="30" fill="url(#gNorm)" class="svg-smooth" />
+            <rect id="svgPipeR" x="487" y="220" width="291" height="30" fill="url(#gNorm)" class="svg-smooth" />
+
+            <!-- Poço PV-01 -->
+            <rect x="110" y="66" width="68" height="186" fill="#0f1f36" stroke="#475569" stroke-width="2" />
+            <rect id="svgPv1" x="112" y="214" width="64" height="36" fill="url(#gNorm)" class="svg-smooth" />
+            <rect x="136" y="72" width="16" height="28" rx="3" fill="#07111f" stroke="#00d4ff" stroke-width="1.5" />
+            <circle cx="144" cy="83" r="4" fill="#10b981" />
+            <text x="144" y="118" text-anchor="middle" fill="#f8fafc" font-family="monospace" font-size="11" font-weight="700">PV-01</text>
+            <text id="lblPv1" x="144" y="132" text-anchor="middle" fill="#38e8ff" font-family="monospace" font-size="10">120 L/s</text>
+
+            <!-- Poço PV-02 -->
+            <rect x="366" y="66" width="68" height="186" fill="#0f1f36" stroke="#475569" stroke-width="2" />
+            <rect id="svgPv2" x="368" y="212" width="64" height="38" fill="url(#gNorm)" class="svg-smooth" />
+            <rect x="392" y="72" width="16" height="28" rx="3" fill="#07111f" stroke="#00d4ff" stroke-width="1.5" />
+            <circle id="ledPv2" cx="400" cy="83" r="4" fill="#10b981" />
+            <text x="400" y="118" text-anchor="middle" fill="#f8fafc" font-family="monospace" font-size="11" font-weight="700">PV-02</text>
+            <text id="lblPv2" x="400" y="132" text-anchor="middle" fill="#38e8ff" font-family="monospace" font-size="10">28 cm</text>
+
+            <!-- Obstrução entre PV-02 e PV-03 -->
+            <g id="svgDebris" opacity="0" class="svg-smooth">
+              <path d="M475 250 L488 208 L506 216 L518 190 L532 212 L544 250 Z" fill="#78350f" stroke="#f59e0b" stroke-width="1.8" />
+              <circle cx="502" cy="232" r="7" fill="#92400e" />
+              <circle cx="520" cy="226" r="6" fill="#b45309" />
+              <text x="510" y="172" text-anchor="middle" fill="#fbbf24" font-family="monospace" font-size="10" font-weight="700">OBSTRUÇÃO</text>
+            </g>
+
+            <!-- Poço PV-03 -->
+            <rect x="622" y="66" width="68" height="186" fill="#0f1f36" stroke="#475569" stroke-width="2" />
+            <rect id="svgPv3" x="624" y="214" width="64" height="36" fill="url(#gNorm)" class="svg-smooth" />
+            <rect x="648" y="72" width="16" height="28" rx="3" fill="#07111f" stroke="#00d4ff" stroke-width="1.5" />
+            <circle cx="656" cy="83" r="4" fill="#10b981" />
+            <text x="656" y="118" text-anchor="middle" fill="#f8fafc" font-family="monospace" font-size="11" font-weight="700">PV-03</text>
+            <text id="lblPv3" x="656" y="132" text-anchor="middle" fill="#38e8ff" font-family="monospace" font-size="10">118 L/s</text>
+
+            <!-- Fluxo animado -->
+            <line id="flowL" x1="34" y1="236" x2="472" y2="236" stroke="#bae6fd" stroke-width="3" stroke-linecap="round" class="water-fast" />
+            <line id="flowR" x1="546" y1="236" x2="768" y2="236" stroke="#bae6fd" stroke-width="3" stroke-linecap="round" class="water-fast" />
+
+            <text x="16" y="278" fill="#64748b" font-family="monospace" font-size="10">ESP32-C3 + Ultrassônico em Standpipe (+25 cm)</text>
+            <text x="784" y="278" text-anchor="end" fill="#64748b" font-family="monospace" font-size="10">FLUXO PLUVIAL →</text>
+          </svg>
+        </div>
+
+        <!-- Painel Lateral de Telemetria -->
+        <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted); font-weight:700;">SEMÁFORO OPERACIONAL</span>
+              <span id="simBadge" class="badge badge-emerald">● NORMAL</span>
+            </div>
+
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <div class="metric-label">Lâmina d'água (PV-02)</div>
+                <div id="mLevel" class="metric-val">28 cm</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Vazão Saída (PV-03)</div>
+                <div id="mFlow" class="metric-val" style="color:var(--emerald);">118 L/s</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Fator F_obs</div>
+                <div id="mFobs" class="metric-val" style="color:var(--emerald);">0.02</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Vazão Entrada (PV-01)</div>
+                <div class="metric-val" style="color:var(--cyan);">120 L/s</div>
+              </div>
+            </div>
+
+            <p id="simHint" style="font-size:0.79rem; color:var(--text-soft); line-height:1.45; padding:9px 11px; border-radius:10px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3);">
+              Escoamento regular entre PV-01, PV-02 e PV-03. Sem retenção detectada.
+            </p>
+          </div>
+
+          <button class="btn-primary" style="margin-top:10px;" onclick="openDispatchModal()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Ordem de Despacho CODESAL (&lt; 10s)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 5: VALIDAÇÃO EM CAMPO & VOZ DA COMUNIDADE ==================== -->
+    <section class="slide" data-title="Validação em Campo & Voz da Comunidade">
+      <div class="slide-head">
+        <div>
+          <span class="kicker">05 • Extensão na Prática (PEX-MDL-56)</span>
+          <h2 class="slide-title">Validação em Campo & Voz da Comunidade</h2>
+        </div>
+      </div>
+
+      <!-- 2 COLUNAS LADO A LADO: 44% TEXTO | 56% CARROSSEL INTERATIVO -->
+      <div class="field-grid">
+        <!-- COLUNA ESQUERDA (44%) -->
+        <div class="field-col-left">
+          <div>
+            <span class="badge badge-cyan" style="white-space:normal; line-height:1.35;">
+              Pesquisa de Campo • Av. Vasco da Gama • 13/10/2026 (08h58–09h30)
+            </span>
+          </div>
+
+          <div class="quote-card">
+            <p class="quote-text">
+              “Antes das obras do BRT, os alagamentos na via eram tão severos que a água acumulava em grandes proporções — chegando a aparecer até peixes nos pontos alagados.”
+            </p>
+            <div class="quote-author">— Relato dos 2 moradores / comerciantes entrevistados</div>
+          </div>
+
+          <div class="insight-block">
+            <div class="insight-head" style="color:var(--amber);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              O que os moradores relataram
+            </div>
+            <p class="insight-text">
+              Houve melhora indireta após as obras do BRT, mas persiste o risco de retorno dos alagamentos por <strong>entupimento invisível das galerias</strong> durante chuvas fortes.
+            </p>
+          </div>
+
+          <div class="insight-block" style="border-color:rgba(16,185,129,0.34);">
+            <div class="insight-head" style="color:var(--emerald);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              Como contribuíram para o projeto
+            </div>
+            <p class="insight-text">
+              Validaram a dor real da população e direcionaram o foco do sistema para o <strong>monitoramento preventivo contínuo</strong>, antecipando obstruções antes do transbordamento.
+            </p>
+          </div>
+        </div>
+
+        <!-- COLUNA DIREITA (56%): CARROSSEL HORIZONTAL INTERATIVO -->
+        <div id="carouselDropZone" class="field-col-right">
+          <div id="carouselViewport" class="carousel-viewport">
+            <!-- Badge contador superior esquerdo -->
+            <span id="carouselCounter" class="carousel-badge-top">Foto 1 / 6</span>
+
+            <!-- Botão discreto Ampliar superior direito -->
+            <button id="carouselExpandBtn" class="carousel-btn-expand hidden" onclick="openLightbox()" title="Ampliar foto em tela cheia">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+              Ampliar
+            </button>
+
+            <!-- Setas laterais sobrepostas -->
+            <button class="carousel-arrow prev" onclick="stepCarousel(-1)" aria-label="Foto anterior">‹</button>
+            <button class="carousel-arrow next" onclick="stepCarousel(1)" aria-label="Próxima foto">›</button>
+
+            <!-- Faixa horizontal com translateX suave -->
+            <div id="carouselTrack" class="carousel-track"></div>
+
+            <!-- Legenda translúcida na base -->
+            <div class="carousel-caption-bar">
+              <span id="carouselCaption">Vistoria na Av. Vasco da Gama — Registro de Campo</span>
+            </div>
+          </div>
+
+          <!-- Barra compacta abaixo do carrossel: Dots + Auto-Play + Carregar Fotos -->
+          <div class="carousel-footer">
+            <div id="carouselDots" class="carousel-dots"></div>
+
+            <div class="carousel-actions">
+              <button id="btnAutoPlay" class="btn-c-ctrl" onclick="toggleAutoPlay()" title="Pausar/Reproduzir carrossel">
+                <span id="autoPlayIcon">▶</span>
+                <span id="autoPlayLabel">Auto-Play</span>
+              </button>
+              <input type="file" id="multiPhotoInput" accept="image/*" multiple style="display:none;" onchange="handleMultiUpload(event)" />
+              <button class="btn-c-ctrl btn-c-upload" onclick="document.getElementById('multiPhotoInput').click()">
+                + Carregar Fotos
+              </button>
+              <button class="btn-c-ctrl" onclick="clearSavedPhotos()" title="Limpar fotos carregadas">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 6: ARQUITETURA DE BIG DATA EM TEMPO REAL ==================== -->
+    <section class="slide" data-title="Arquitetura de Big Data em Tempo Real">
+      <div class="slide-head">
+        <div>
+          <span class="kicker">06 • Engenharia de Dados em Escala Municipal</span>
+          <h2 class="slide-title">Arquitetura de Big Data em Tempo Real</h2>
+        </div>
+      </div>
+
+      <!-- 3 KPIs de Escala Municipal -->
+      <div class="grid-3">
+        <div class="card kpi-card">
+          <div class="kpi-big" style="color:var(--cyan);">500</div>
+          <div class="kpi-sub">Pontos Críticos em Salvador</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="kpi-big" style="color:var(--amber);">500 ms</div>
+          <div class="kpi-sub">Intervalo de Amostragem Contínua</div>
+        </div>
+        <div class="card kpi-card">
+          <div class="kpi-big" style="color:var(--emerald);">&gt; 86,4M</div>
+          <div class="kpi-sub">Eventos Telemétricos / Dia</div>
+        </div>
+      </div>
+
+      <!-- Fluxo Visual em 6 Camadas -->
+      <div class="pipeline-grid">
+        <div class="pipe-step" style="border-top-color:var(--cyan);">
+          <span class="pipe-num">01 • EDGE</span>
+          <div class="pipe-title">ESP32-C3</div>
+          <div class="pipe-desc">Filtro Média Móvel + <strong>Standpipe +25 cm</strong> (elimina zona cega).</div>
+        </div>
+
+        <div class="pipe-step" style="border-top-color:#38bdf8;">
+          <span class="pipe-num" style="color:#38bdf8;">02 • INGESTÃO</span>
+          <div class="pipe-title">Apache Kafka</div>
+          <div class="pipe-desc">Streaming de alta vazão para milhões de pacotes/dia.</div>
+        </div>
+
+        <div class="pipe-step" style="border-top-color:var(--amber);">
+          <span class="pipe-num" style="color:var(--amber);">03 • STREAM</span>
+          <div class="pipe-title">Spark Streaming</div>
+          <div class="pipe-desc">Janela deslizante e cálculo contínuo de <strong>F_obs</strong>.</div>
+        </div>
+
+        <div class="pipe-step" style="border-top-color:var(--blue);">
+          <span class="pipe-num" style="color:#60a5fa;">04 • STORAGE</span>
+          <div class="pipe-title">Híbrido</div>
+          <div class="pipe-desc"><strong>TimescaleDB</strong> + Data Lake <strong>MongoDB / Parquet</strong>.</div>
+        </div>
+
+        <div class="pipe-step" style="border-top-color:#a78bfa;">
+          <span class="pipe-num" style="color:#a78bfa;">05 • SERVIÇO</span>
+          <div class="pipe-title">API .NET 8</div>
+          <div class="pipe-desc">Validação de schema, regras de alerta e detecção offline.</div>
+        </div>
+
+        <div class="pipe-step" style="border-top-color:var(--emerald);">
+          <span class="pipe-num" style="color:var(--emerald);">06 • OPERAÇÃO</span>
+          <div class="pipe-title">Dashboard React</div>
+          <div class="pipe-desc">Mapa georreferenciado, semáforo e rotas preventivas.</div>
+        </div>
+      </div>
+
+      <div class="pill-bar">
+        <span class="badge badge-cyan">Curto Prazo: Alerta imediato (120 → 15 L/s)</span>
+        <span class="badge badge-emerald">Longo Prazo: Padrões sazonais &amp; rotas de hidrojateamento</span>
+        <span class="badge badge-amber">Correlação Pluviométrica (CEMADEN / INMET)</span>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 7: SEGURANÇA & PRIVACIDADE ==================== -->
+    <section class="slide" data-title="Segurança & Privacidade">
+      <div class="slide-head">
+        <div>
+          <span class="kicker">07 • Security & Privacy by Design</span>
+          <h2 class="slide-title">Segurança & Privacidade desde a Concepção</h2>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card sec-card">
+          <div class="icon-box" style="background:rgba(239,68,68,0.14); color:var(--red); margin-bottom:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div>
+            <h3 class="card-h3">Riscos Mitigados</h3>
+            <p class="card-p">Defesa contra <strong>Spoofing</strong> de telemetria (alarmes falsos de enchente), ataques <strong>DDoS</strong> na API de ingestão, sequestro de nós IoT e acesso indevido ao painel operacional.</p>
+          </div>
+        </div>
+
+        <div class="card sec-card">
+          <div class="icon-box" style="background:rgba(0,212,255,0.14); color:var(--cyan); margin-bottom:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <h3 class="card-h3">Criptografia & Controle de Acesso</h3>
+            <p class="card-p">Certificados <strong>X.509</strong> por nó sensor, cifragem <strong>LoRaWAN AES-128</strong> e <strong>TLS 1.3</strong>, banco com <strong>AES-256</strong> em repouso, <strong>RBAC + MFA</strong> e <strong>trilhas imutáveis</strong>.</p>
+          </div>
+        </div>
+
+        <div class="card sec-card">
+          <div class="icon-box" style="background:rgba(16,185,129,0.14); color:var(--emerald); margin-bottom:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div>
+            <h3 class="card-h3">Conformidade LGPD (Lei nº 13.709/2018)</h3>
+            <p class="card-p">Telemetria hidráulica não coleta dados pessoais; ocorrências cidadãs geolocalizadas recebem <strong>anonimização nativa na ingestão</strong> (Art. 7º — proteção da vida e políticas públicas).</p>
+          </div>
+        </div>
+
+        <div class="card sec-card">
+          <div class="icon-box" style="background:rgba(59,130,246,0.16); color:var(--blue); margin-bottom:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+          </div>
+          <div>
+            <h3 class="card-h3">Governança Institucional</h3>
+            <p class="card-p">Designação formal de <strong>DPO / AI Owner</strong> responsável pela governança de chaves criptográficas, supervisão de auditorias algorítmicas e conformidade junto à ANPD.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 8: MVP VALIDADO, CRONOGRAMA & PRÓXIMOS PASSOS ==================== -->
+    <section class="slide" data-title="MVP, Cronograma & Próximos Passos">
+      <div class="slide-head">
+        <div>
+          <span class="kicker">08 • Prova de Conceito, Execução & Escala</span>
+          <h2 class="slide-title">MVP Validado, Cronograma & Próximos Passos</h2>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- MVP Validado -->
+        <div class="card" style="border-color:rgba(16,185,129,0.45); background:rgba(16,185,129,0.06);">
+          <span class="badge badge-emerald">✓ VALIDADO EM BANCADA</span>
+          <h3 class="card-h3" style="margin-top:8px;">MVP Físico Funcional</h3>
+          <div class="price-highlight">R$ 183,00</div>
+          <ul class="clean-list">
+            <li><span style="color:var(--emerald);">✓</span> Maquete hidráulica fechada com bombeamento contínuo</li>
+            <li><span style="color:var(--emerald);">✓</span> Microcontrolador <strong>ESP32-C3</strong> + sensor ultrassônico</li>
+            <li><span style="color:var(--emerald);">✓</span> Telemetria validada em tempo real (<strong>500 ms</strong>)</li>
+          </ul>
+        </div>
+
+        <!-- Próximos Passos — Escala Piloto na Av. Bonocô -->
+        <div class="card" style="border-color:rgba(0,212,255,0.45); background:rgba(0,212,255,0.06);">
+          <span class="badge badge-cyan">→ EVOLUÇÃO EM CAMPO</span>
+          <h3 class="card-h3" style="margin-top:8px;">Próximos Passos — Escala Piloto na Av. Bonocô</h3>
+          <div class="price-highlight" style="color:var(--cyan);">IP68 • 3 PVs Reais</div>
+          <ul class="clean-list">
+            <li><span style="color:var(--cyan);">→</span> Evolução para invólucros industriais <strong>IP68</strong> (à prova de submersão)</li>
+            <li><span style="color:var(--cyan);">→</span> Implantação piloto controlada em <strong>3 poços de visita reais</strong> na Av. Bonocô</li>
+            <li><span style="color:var(--cyan);">→</span> Cooperação técnica operacional junto à <strong>CODESAL</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Cronograma APIEXT (Ago–Nov 2026) -->
+      <div class="timeline-row">
+        <div class="t-step">
+          <div class="t-month">AGO 2026</div>
+          <div class="t-desc">Definição do tema e escopo técnico</div>
+        </div>
+        <div class="t-step" style="border-top-color:var(--blue);">
+          <div class="t-month" style="color:#60a5fa;">SET 2026</div>
+          <div class="t-desc">Projeto PEX-MDL-54 e assessoramentos</div>
+        </div>
+        <div class="t-step" style="border-top-color:var(--emerald);">
+          <div class="t-month" style="color:#34d399;">OUT 2026</div>
+          <div class="t-desc">Maquete 3D e Pesquisa de Campo</div>
+        </div>
+        <div class="t-step" style="border-top-color:var(--amber);">
+          <div class="t-month" style="color:#fbbf24;">NOV 2026</div>
+          <div class="t-desc">Relatório PEX-MDL-56 e Apresentação Final</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 9: ENCERRAMENTO & IMPACTO ==================== -->
+    <section class="slide" data-title="Encerramento & Impacto">
+      <div class="slide-head">
+        <div>
+          <span class="kicker">09 • Integração Acadêmica & Resiliência Urbana</span>
+          <h2 class="slide-title">Encerramento & Impacto</h2>
+        </div>
+      </div>
+
+      <!-- Conexão Interdisciplinar em Sistemas de Informação -->
+      <div class="grid-4">
+        <div class="card" style="border-top:3px solid var(--cyan);">
+          <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--cyan); font-weight:800;">01 • REDES</div>
+          <h3 class="card-h3" style="margin-top:4px; font-size:0.94rem;">Redes de Computadores</h3>
+          <p class="card-p" style="font-size:0.78rem;">LPWAN / MQTT, TLS 1.3, VLAN/VPN e baixa latência (500 ms).</p>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--blue);">
+          <div style="font-family:var(--font-mono); font-size:0.68rem; color:#60a5fa; font-weight:800;">02 • DADOS</div>
+          <h3 class="card-h3" style="margin-top:4px; font-size:0.94rem;">Banco de Dados</h3>
+          <p class="card-p" style="font-size:0.78rem;">Modelagem híbrida (séries temporais + NoSQL) e indexação geoespacial.</p>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--amber);">
+          <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--amber); font-weight:800;">03 • SOFTWARE</div>
+          <h3 class="card-h3" style="margin-top:4px; font-size:0.94rem;">Eng. de Software</h3>
+          <p class="card-p" style="font-size:0.78rem;">Camadas desacopladas (Edge → .NET 8 → React) e testes automatizados.</p>
+        </div>
+
+        <div class="card" style="border-top:3px solid var(--emerald);">
+          <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--emerald); font-weight:800;">04 • PRODUTO</div>
+          <h3 class="card-h3" style="margin-top:4px; font-size:0.94rem;">Gestão & UX</h3>
+          <p class="card-p" style="font-size:0.78rem;">UX para ambientes de crise, semáforo intuitivo e despacho em &lt; 10s.</p>
+        </div>
+      </div>
+
+      <!-- Síntese de Impacto -->
+      <div class="closing-hero">
+        <p class="closing-quote">
+          “Transformando dados invisíveis do subsolo em <span class="gradient-text">resiliência urbana concreta</span> para Salvador.”
+        </p>
+        <p style="font-size:0.9rem; color:var(--text-soft); max-width:740px; margin:0 auto;">
+          Rigor técnico, baixo custo, conformidade ética e impacto socioambiental mensurável antes que a chuva paralise a cidade.
+        </p>
+      </div>
+
+      <!-- Fechamento para Banca -->
+      <div class="pill-bar" style="justify-content:space-between; padding:12px 18px;">
+        <span style="font-size:0.8rem; color:var(--text-soft);">
+          <strong>Equipe:</strong> Alex Teixeira • Davi Leal • Enoque Pereira • Matheus Flores • Thales Araújo
+        </span>
+        <span class="badge badge-cyan" style="font-size:0.8rem; padding:6px 15px;">Obrigado! Aberto às Perguntas da Banca</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       BARRA INFERIOR DISCRETA (PROGRESSO, CONTADOR E CONTROLES)
+       ========================================================================= -->
+  <footer class="bottom-bar">
+    <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+    <div class="bottom-inner">
+      <div class="bottom-left">
+        <span class="brand-mini hide-sm">REDE SUBTERRÂNEA</span>
+        <span id="slideCounter" class="pill-counter">01 / 09</span>
+      </div>
+
+      <div class="bottom-center">
+        <button id="btnPrev" class="nav-btn" onclick="prevSlide()">← <span class="hide-sm">Anterior</span></button>
+        <button id="btnNext" class="nav-btn primary" onclick="nextSlide()"><span class="hide-sm">Próximo</span> →</button>
+      </div>
+
+      <div class="bottom-right">
+        <button class="tool-btn" onclick="toggleIndexModal()" title="Índice Rápido (M)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="15" y2="18"/></svg>
+          <span class="hide-sm">Índice (M)</span>
+        </button>
+        <button id="btnNotes" class="tool-btn" onclick="toggleNotes()" title="Notas do Apresentador (N)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span class="hide-sm">Notas (N)</span>
+        </button>
+        <button class="tool-btn" onclick="toggleFullscreen()" title="Tela Cheia (F)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          <span class="hide-sm">Tela Cheia (F)</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Painel de Notas do Apresentador (Tecla N) -->
+  <aside id="notesPanel" class="notes-panel" aria-live="polite">
+    <div class="notes-head">
+      <span>● NOTAS DO APRESENTADOR</span>
+      <button class="tool-btn" style="padding:3px 8px; font-size:0.68rem;" onclick="toggleNotes()">Fechar ✕</button>
+    </div>
+    <p id="notesText" class="notes-body"></p>
+  </aside>
+
+  <!-- Modal: Índice Rápido (Tecla M) -->
+  <div id="indexOverlay" class="overlay" onclick="if(event.target===this) toggleIndexModal()">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--cyan); font-weight:700;">NAVEGAÇÃO RÁPIDA</span>
+          <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-top:2px;">Índice da Apresentação</h3>
+        </div>
+        <button class="tool-btn" style="padding:4px 9px;" onclick="toggleIndexModal()">✕</button>
+      </div>
+      <div id="indexList" class="modal-list"></div>
+      <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:10px;">
+        Atalhos: ← / → / Espaço • F Tela Cheia • N Notas • M Índice • Esc Fechar
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Ordem de Despacho CODESAL -->
+  <div id="dispatchOverlay" class="overlay" onclick="if(event.target===this) closeDispatchModal()">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div>
+          <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--emerald); font-weight:700;">ORDEM GERADA EM 2.1 SEGUNDOS</span>
+          <h3 style="font-family:var(--font-display); font-size:1.15rem; margin-top:2px;">Despacho Preventivo — CODESAL</h3>
+        </div>
+        <button class="tool-btn" style="padding:4px 9px;" onclick="closeDispatchModal()">✕</button>
+      </div>
+
+      <div class="modal-row"><span style="color:var(--text-muted);">PROTOCOLO</span><strong id="dispId" style="color:var(--cyan);">#RS-2026-4812</strong></div>
+      <div class="modal-row"><span style="color:var(--text-muted);">TRECHO</span><strong>Av. Bonocô • PV-02 → PV-03</strong></div>
+      <div class="modal-row"><span style="color:var(--text-muted);">COORDENADAS</span><strong style="color:var(--emerald);">-12.9834° S, -38.4972° W</strong></div>
+      <div class="modal-row"><span style="color:var(--text-muted);">PRIORIDADE</span><strong id="dispPrio" style="color:var(--amber);">PREVENTIVA</strong></div>
+
+      <p style="font-size:0.82rem; color:var(--text-soft); line-height:1.45; margin:12px 0 16px;">
+        Ordem enviada à equipe de hidrojateamento (SUCOP) e apoio viário (TRANSALVADOR) com pista ainda desobstruída.
+      </p>
+      <button class="btn-primary" onclick="closeDispatchModal()">Confirmar Despacho</button>
+    </div>
+  </div>
+
+  <!-- Lightbox Tela Cheia (Carrossel de Campo) -->
+  <div id="lightboxOverlay" class="overlay" onclick="if(event.target===this) closeLightbox()">
+    <div class="lightbox-wrap">
+      <img id="lightboxImg" class="lightbox-img" src="" alt="Registro de campo ampliado" />
+      <div class="lightbox-bar">
+        <button class="tool-btn" onclick="stepLightbox(-1)">← Anterior</button>
+        <div style="display:flex; align-items:center; gap:8px; font-size:0.86rem; font-weight:600;">
+          <span id="lightboxBadge" class="badge badge-cyan">Foto 1 / 6</span>
+          <span id="lightboxCaption">Vistoria na Av. Vasco da Gama</span>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="tool-btn" onclick="stepLightbox(1)">Próxima →</button>
+          <button class="tool-btn" onclick="closeLightbox()">Fechar ✕</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       JAVASCRIPT PURO (100% OFFLINE)
+       ========================================================================= -->
+  <script>
+    /* -------------------- ESTADO GLOBAL -------------------- */
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let currentSlide = 0;
+    let simState = 'normal';
+
+    // Estado do Carrossel (Slide 5)
+    let carouselIdx = 0;
+    let autoPlayTimer = null;
+
+    // Notas do apresentador objetivas (sem qualquer menção a projetos futuros fora da Escala Piloto)
+    const speakerNotes = [
+      "Slide 1 (Capa): Cumprimente o Prof. Ramon Pinto Silva dos Santos Sales, a Coord. Laiz Araújo e a banca. Apresente o 'Rede Subterrânea', projeto de extensão da APIEXT III (6º semestre de Sistemas de Informação, UNINASSAU Salvador) com a equipe de 5 discentes.",
+      "Slide 2 (Problema & Contexto): Contextualize Salvador com dados oficiais (2,41M habitantes, 3.486 hab/km², IDHM 0,759, PIB per capita R$ 31.724). Explique o problema silencioso na Av. Bonocô e Av. Vasco da Gama: resíduos obstruem galerias sem visibilidade, tornando a gestão reativa. Destaque ODS 6, 9, 11 e Norma ANA nº 12/2025.",
+      "Slide 3 (A Solução & Público-Alvo): Explique a comparação contínua de fluxo entre PV-01, PV-02 e PV-03 para gerar alerta precoce antes da água atingir o asfalto. Destaque os operadores B2G (CODESAL, SUCOP, TRANSALVADOR) e os beneficiários finais (moradores, motoristas e pedestres).",
+      "Slide 4 (Simulador Ao Vivo): Faça a demonstração clicando em Normal, Alerta e Crítico (120 → 15 L/s). Mostre a elevação da lâmina d'água, o fator F_obs e clique em 'Ordem de Despacho CODESAL (< 10s)' para exibir o protocolo com coordenadas exatas.",
+      "Slide 5 (Validação em Campo): Relate a visita à Av. Vasco da Gama em 13/10/2026 (08h58–09h30). Leia o relato dos moradores sobre os alagamentos severos antes do BRT (quando chegavam a aparecer peixes) e explique como eles validaram o monitoramento preventivo contínuo. Use as setas ‹ › ou o Auto-Play do carrossel ao lado e clique na foto para ampliar.",
+      "Slide 6 (Arquitetura de Big Data): Apresente a escala municipal: 500 pontos críticos, amostragem a cada 500 ms e mais de 86,4 milhões de eventos/dia. Percorra o pipeline: ESP32-C3 + Média Móvel + Standpipe (+25 cm) → Apache Kafka → Spark Streaming → TimescaleDB + MongoDB/Parquet → API .NET 8 → Dashboard React.",
+      "Slide 7 (Segurança & Privacidade): Destaque a proteção contra spoofing, DDoS e acesso indevido com X.509, LoRaWAN AES-128, TLS 1.3, AES-256 em repouso, RBAC + MFA e trilhas imutáveis. Reforce a conformidade LGPD (Lei nº 13.709/2018), anonimização na ingestão e governança via DPO / AI Owner.",
+      "Slide 8 (MVP, Cronograma & Próximos Passos): Mostre o MVP físico de bancada já validado (maquete hidráulica fechada, ESP32-C3, sensor ultrassônico, 500 ms) com custo total de R$ 183,00. Recapitule o cronograma Ago–Nov 2026 e apresente os Próximos Passos — Escala Piloto na Av. Bonocô (invólucros IP68 + 3 PVs reais com a CODESAL).",
+      "Slide 9 (Encerramento & Impacto): Conecte o projeto às 4 áreas de Sistemas de Informação (Redes, Banco de Dados, Engenharia de Software e Gestão/UX), conclua com o impacto de resiliência urbana para Salvador e abra espaço para perguntas da banca."
+    ];
+
+    // 6 registros fotográficos de campo (Slide 5)
+    const STORAGE_KEY = 'rede_subterranea_carousel_v3';
+    const fieldPhotos = [
+      { file: 'WhatsApp Image 2026-11-24 at 21.29.13.jpeg', caption: 'Vistoria na Av. Vasco da Gama — Registro de Campo' },
+      { file: 'WhatsApp Image 2026-11-24 at 21.29.13 (1).jpeg', caption: 'Entrevista com morador/comerciante sobre histórico de alagamentos' },
+      { file: 'WhatsApp Image 2026-11-24 at 21.29.13 (2).jpeg', caption: 'Escuta ativa da comunidade no comércio local da avenida' },
+      { file: 'WhatsApp Image 2026-11-24 at 21.29.13 (3).jpeg', caption: 'Relato sobre melhoria após o BRT e atenção à drenagem' },
+      { file: 'WhatsApp Image 2026-11-24 at 21.29.13 (4).jpeg', caption: 'Observação da infraestrutura viária e corredor do BRT' },
+      { file: 'WhatsApp Image 2026-11-24 at 21.29.13 (5).jpeg', caption: 'Mapeamento de pontos críticos junto aos beneficiários' }
+    ];
+
+    const resolvedPhotoSrc = new Array(fieldPhotos.length).fill(null);
+    let savedUploads = loadSavedUploads();
+
+    function loadSavedUploads() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function persistUploads() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(savedUploads));
+      } catch {
+        showToast('Fotos carregadas nesta sessão (limite de armazenamento local atingido).');
+      }
+    }
+
+    /* -------------------- INICIALIZAÇÃO -------------------- */
+    function init() {
+      const indexList = document.getElementById('indexList');
+      slides.forEach((s, idx) => {
+        const title = s.dataset.title || `Slide ${idx + 1}`;
+        const item = document.createElement('button');
+        item.className = 'index-item';
+        item.innerHTML = `<span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--cyan); font-weight:700;">${String(idx + 1).padStart(2, '0')}</span><span>${title}</span>`;
+        item.onclick = () => { goToSlide(idx); toggleIndexModal(); };
+        indexList.appendChild(item);
+      });
+
+      buildCarouselDOM();
+      setupCarouselDragAndDrop();
+      resolveAllPhotosSilently();
+      updateUI();
+    }
+
+    function updateUI() {
+      slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+
+      const total = slides.length;
+      document.getElementById('slideCounter').textContent = `${String(currentSlide + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+      document.getElementById('progressFill').style.width = `${((currentSlide + 1) / total) * 100}%`;
+
+      document.getElementById('btnPrev').disabled = currentSlide === 0;
+      document.getElementById('btnNext').disabled = currentSlide === total - 1;
+
+      Array.from(document.getElementById('indexList').children).forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+      document.getElementById('notesText').textContent = speakerNotes[currentSlide] || '';
+
+      // Pausa auto-play ao sair do Slide 5 para economizar recursos
+      if (currentSlide !== 4 && autoPlayTimer) {
+        stopAutoPlay();
+      }
+    }
+
+    function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateUI(); } }
+    function prevSlide() { if (currentSlide > 0) { currentSlide--; updateUI(); } }
+    function goToSlide(idx) { if (idx >= 0 && idx < slides.length) { currentSlide = idx; updateUI(); } }
+
+    function toggleNotes() {
+      const panel = document.getElementById('notesPanel');
+      const btn = document.getElementById('btnNotes');
+      const isOpen = panel.classList.toggle('open');
+      btn.classList.toggle('active-toggle', isOpen);
+    }
+
+    function toggleIndexModal() {
+      document.getElementById('indexOverlay').classList.toggle('open');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+      else document.exitFullscreen().catch(() => {});
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 3200);
+    }
+
+    /* -------------------- SIMULADOR HIDRÁULICO (SLIDE 4) -------------------- */
+    function setSim(mode) {
+      simState = mode;
+      document.getElementById('btnSimNormal').className = 'sim-btn' + (mode === 'normal' ? ' active-normal' : '');
+      document.getElementById('btnSimAlerta').className = 'sim-btn' + (mode === 'alerta' ? ' active-alerta' : '');
+      document.getElementById('btnSimCritico').className = 'sim-btn' + (mode === 'critico' ? ' active-critico' : '');
+
+      const pipeL = document.getElementById('svgPipeL');
+      const pipeR = document.getElementById('svgPipeR');
+      const pv1 = document.getElementById('svgPv1');
+      const pv2 = document.getElementById('svgPv2');
+      const pv3 = document.getElementById('svgPv3');
+      const led2 = document.getElementById('ledPv2');
+      const debris = document.getElementById('svgDebris');
+      const flowL = document.getElementById('flowL');
+      const flowR = document.getElementById('flowR');
+      const badge = document.getElementById('simBadge');
+      const hint = document.getElementById('simHint');
+
+      if (mode === 'normal') {
+        pipeL.setAttribute('y', '220'); pipeL.setAttribute('height', '30'); pipeL.setAttribute('fill', 'url(#gNorm)');
+        pipeR.setAttribute('y', '220'); pipeR.setAttribute('height', '30'); pipeR.setAttribute('fill', 'url(#gNorm)');
+        pv1.setAttribute('y', '214'); pv1.setAttribute('height', '36'); pv1.setAttribute('fill', 'url(#gNorm)');
+        pv2.setAttribute('y', '212'); pv2.setAttribute('height', '38'); pv2.setAttribute('fill', 'url(#gNorm)');
+        pv3.setAttribute('y', '214'); pv3.setAttribute('height', '36'); pv3.setAttribute('fill', 'url(#gNorm)');
+        led2.setAttribute('fill', '#10b981');
+        debris.setAttribute('opacity', '0');
+        flowL.setAttribute('class', 'water-fast'); flowR.setAttribute('class', 'water-fast');
+
+        document.getElementById('lblPv2').textContent = '28 cm';
+        document.getElementById('lblPv3').textContent = '118 L/s';
+        document.getElementById('mLevel').textContent = '28 cm';
+        document.getElementById('mFlow').textContent = '118 L/s';
+        document.getElementById('mFlow').style.color = 'var(--emerald)';
+        document.getElementById('mFobs').textContent = '0.02';
+        document.getElementById('mFobs').style.color = 'var(--emerald)';
+
+        badge.className = 'badge badge-emerald'; badge.textContent = '● NORMAL';
+        hint.style.background = 'rgba(16,185,129,0.1)'; hint.style.borderColor = 'rgba(16,185,129,0.3)';
+        hint.textContent = 'Escoamento regular entre PV-01, PV-02 e PV-03. Sem retenção detectada.';
+      } else if (mode === 'alerta') {
+        pipeL.setAttribute('y', '198'); pipeL.setAttribute('height', '52'); pipeL.setAttribute('fill', 'url(#gWarn)');
+        pipeR.setAttribute('y', '230'); pipeR.setAttribute('height', '20'); pipeR.setAttribute('fill', 'url(#gNorm)');
+        pv1.setAttribute('y', '186'); pv1.setAttribute('height', '64'); pv1.setAttribute('fill', 'url(#gWarn)');
+        pv2.setAttribute('y', '160'); pv2.setAttribute('height', '90'); pv2.setAttribute('fill', 'url(#gWarn)');
+        pv3.setAttribute('y', '228'); pv3.setAttribute('height', '22'); pv3.setAttribute('fill', 'url(#gNorm)');
+        led2.setAttribute('fill', '#f59e0b');
+        debris.setAttribute('opacity', '0.72');
+        flowL.setAttribute('class', 'water-mid'); flowR.setAttribute('class', 'water-mid');
+
+        document.getElementById('lblPv2').textContent = '72 cm';
+        document.getElementById('lblPv3').textContent = '65 L/s';
+        document.getElementById('mLevel').textContent = '72 cm';
+        document.getElementById('mFlow').textContent = '65 L/s';
+        document.getElementById('mFlow').style.color = 'var(--amber)';
+        document.getElementById('mFobs').textContent = '0.46';
+        document.getElementById('mFobs').style.color = 'var(--amber)';
+
+        badge.className = 'badge badge-amber'; badge.textContent = '▲ ALERTA';
+        hint.style.background = 'rgba(245,158,11,0.12)'; hint.style.borderColor = 'rgba(245,158,11,0.38)';
+        hint.textContent = 'Retenção inicial entre PV-02 e PV-03. Recomenda-se limpeza preventiva.';
+      } else {
+        pipeL.setAttribute('y', '182'); pipeL.setAttribute('height', '68'); pipeL.setAttribute('fill', 'url(#gCrit)');
+        pipeR.setAttribute('y', '240'); pipeR.setAttribute('height', '10'); pipeR.setAttribute('fill', 'url(#gNorm)');
+        pv1.setAttribute('y', '144'); pv1.setAttribute('height', '106'); pv1.setAttribute('fill', 'url(#gCrit)');
+        pv2.setAttribute('y', '112'); pv2.setAttribute('height', '138'); pv2.setAttribute('fill', 'url(#gCrit)');
+        pv3.setAttribute('y', '238'); pv3.setAttribute('height', '12'); pv3.setAttribute('fill', 'url(#gNorm)');
+        led2.setAttribute('fill', '#ef4444');
+        debris.setAttribute('opacity', '1');
+        flowL.setAttribute('class', 'water-slow'); flowR.setAttribute('class', 'water-slow');
+
+        document.getElementById('lblPv2').textContent = '118 cm';
+        document.getElementById('lblPv3').textContent = '15 L/s';
+        document.getElementById('mLevel').textContent = '118 cm';
+        document.getElementById('mFlow').textContent = '15 L/s';
+        document.getElementById('mFlow').style.color = 'var(--red)';
+        document.getElementById('mFobs').textContent = '0.88';
+        document.getElementById('mFobs').style.color = 'var(--red)';
+
+        badge.className = 'badge badge-red'; badge.textContent = '● CRÍTICO';
+        hint.style.background = 'rgba(239,68,68,0.15)'; hint.style.borderColor = 'rgba(239,68,68,0.45)';
+        hint.textContent = 'Obstrução severa (120 → 15 L/s)! Risco iminente na Av. Bonocô. Acione o despacho!';
+      }
+    }
+
+    function openDispatchModal() {
+      document.getElementById('dispId').textContent = `#RS-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+      const prio = document.getElementById('dispPrio');
+      if (simState === 'critico') { prio.textContent = 'CRÍTICA — IMEDIATA'; prio.style.color = 'var(--red)'; }
+      else if (simState === 'alerta') { prio.textContent = 'ALTA — PREVENTIVA'; prio.style.color = 'var(--amber)'; }
+      else { prio.textContent = 'ROTINA — MONITORAMENTO'; prio.style.color = 'var(--emerald)'; }
+      document.getElementById('dispatchOverlay').classList.add('open');
+    }
+
+    function closeDispatchModal() {
+      document.getElementById('dispatchOverlay').classList.remove('open');
+    }
+
+    /* -------------------- CARROSSEL INTERATIVO DE FOTOS (SLIDE 5) -------------------- */
+    function buildCarouselDOM() {
+      const track = document.getElementById('carouselTrack');
+      const dots = document.getElementById('carouselDots');
+      track.innerHTML = '';
+      dots.innerHTML = '';
+
+      fieldPhotos.forEach((item, idx) => {
+        const slideEl = document.createElement('div');
+        slideEl.className = 'carousel-slide';
+        slideEl.id = `cSlide-${idx}`;
+
+        const img = document.createElement('img');
+        img.alt = item.caption;
+        img.onclick = () => openLightbox();
+
+        const placeholder = document.createElement('div');
+        placeholder.className = 'carousel-placeholder';
+        placeholder.onclick = () => document.getElementById('multiPhotoInput').click();
+        placeholder.innerHTML = `
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="1.6" opacity="0.9">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <div style="font-size:0.86rem; font-weight:700; color:var(--text-main);">Arraste e solte as fotos aqui ou clique em "+ Carregar Fotos"</div>
+          <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted);">Registro ${idx + 1}/6 • ${item.file}</div>
+        `;
+
+        slideEl.appendChild(img);
+        slideEl.appendChild(placeholder);
+        track.appendChild(slideEl);
+
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'c-dot';
+        dot.title = `Foto ${idx + 1}: ${item.caption}`;
+        dot.onclick = () => goToCarousel(idx);
+        dots.appendChild(dot);
+      });
+
+      updateCarouselUI();
+    }
+
+    function resolveAllPhotosSilently() {
+      fieldPhotos.forEach((item, idx) => {
+        if (savedUploads[idx]) {
+          setCarouselSlotPhoto(idx, savedUploads[idx]);
+          return;
+        }
+        // Detecção silenciosa do arquivo local na mesma pasta (sem exibir erro/ícone quebrado)
+        const probe = new Image();
+        probe.onload = () => {
+          if (!savedUploads[idx]) {
+            setCarouselSlotPhoto(idx, item.file);
+          }
+        };
+        probe.onerror = () => {
+          // Mantém placeholder minimalista
+        };
+        probe.src = item.file;
+      });
+    }
+
+    function setCarouselSlotPhoto(idx, src) {
+      resolvedPhotoSrc[idx] = src;
+      const slideEl = document.getElementById(`cSlide-${idx}`);
+      if (!slideEl) return;
+      const img = slideEl.querySelector('img');
+      if (src) {
+        img.src = src;
+        slideEl.classList.add('has-photo');
+      } else {
+        img.removeAttribute('src');
+        slideEl.classList.remove('has-photo');
+      }
+      updateCarouselUI();
+    }
+
+    function updateCarouselUI() {
+      const track = document.getElementById('carouselTrack');
+      track.style.transform = `translateX(-${carouselIdx * 100}%)`;
+
+      document.getElementById('carouselCounter').textContent = `Foto ${carouselIdx + 1} / ${fieldPhotos.length}`;
+      document.getElementById('carouselCaption').textContent = fieldPhotos[carouselIdx].caption;
+
+      const expandBtn = document.getElementById('carouselExpandBtn');
+      expandBtn.classList.toggle('hidden', !resolvedPhotoSrc[carouselIdx]);
+
+      const dotBtns = document.getElementById('carouselDots').children;
+      Array.from(dotBtns).forEach((d, i) => d.classList.toggle('active', i === carouselIdx));
+    }
+
+    function goToCarousel(idx) {
+      carouselIdx = (idx + fieldPhotos.length) % fieldPhotos.length;
+      updateCarouselUI();
+    }
+
+    function stepCarousel(dir) {
+      goToCarousel(carouselIdx + dir);
+    }
+
+    function toggleAutoPlay() {
+      if (autoPlayTimer) {
+        stopAutoPlay();
+      } else {
+        autoPlayTimer = setInterval(() => stepCarousel(1), 3500);
+        const btn = document.getElementById('btnAutoPlay');
+        btn.classList.add('active');
+        document.getElementById('autoPlayIcon').textContent = '⏸';
+        document.getElementById('autoPlayLabel').textContent = 'Pausar';
+      }
+    }
+
+    function stopAutoPlay() {
+      if (autoPlayTimer) {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+      }
+      const btn = document.getElementById('btnAutoPlay');
+      if (btn) btn.classList.remove('active');
+      document.getElementById('autoPlayIcon').textContent = '▶';
+      document.getElementById('autoPlayLabel').textContent = 'Auto-Play';
+    }
+
+    function compressImageFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onerror = reject;
+          img.onload = () => {
+            const maxDim = 1280;
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+              else { w = Math.round(w * (maxDim / h)); h = maxDim; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.82));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function processUploadedFiles(fileList) {
+      const files = Array.from(fileList || []).filter(f => f.type && f.type.startsWith('image/'));
+      if (!files.length) return;
+
+      const usedSlots = new Set();
+      const unmatched = [];
+
+      // 1º: casa pelo nome exato do arquivo
+      for (const file of files) {
+        const matchIdx = fieldPhotos.findIndex((p, i) => !usedSlots.has(i) && p.file.toLowerCase() === file.name.toLowerCase());
+        if (matchIdx !== -1) {
+          usedSlots.add(matchIdx);
+          try {
+            const dataUrl = await compressImageFile(file);
+            savedUploads[matchIdx] = dataUrl;
+            setCarouselSlotPhoto(matchIdx, dataUrl);
+          } catch {}
+        } else {
+          unmatched.push(file);
+        }
+      }
+
+      // 2º: preenche slots restantes na sequência
+      let cursor = files.length === 1 ? carouselIdx : 0;
+      for (const file of unmatched) {
+        while (usedSlots.has(cursor) && cursor < fieldPhotos.length) cursor++;
+        if (cursor >= fieldPhotos.length) break;
+        usedSlots.add(cursor);
+        try {
+          const dataUrl = await compressImageFile(file);
+          savedUploads[cursor] = dataUrl;
+          setCarouselSlotPhoto(cursor, dataUrl);
+        } catch {}
+        cursor++;
+      }
+
+      persistUploads();
+      showToast(`${Math.min(files.length, 6)} foto(s) carregada(s) no carrossel!`);
+    }
+
+    function handleMultiUpload(event) {
+      processUploadedFiles(event.target.files);
+      event.target.value = '';
+    }
+
+    function clearSavedPhotos() {
+      savedUploads = {};
+      try { localStorage.removeItem(STORAGE_KEY); } catch {}
+      fieldPhotos.forEach((_, idx) => setCarouselSlotPhoto(idx, null));
+      resolveAllPhotosSilently();
+      showToast('Fotos do carrossel limpas.');
+    }
+
+    function setupCarouselDragAndDrop() {
+      const zone = document.getElementById('carouselDropZone');
+      if (!zone) return;
+
+      ['dragenter', 'dragover'].forEach(ev => {
+        zone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          zone.classList.add('drag-over');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(ev => {
+        zone.addEventListener(ev, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          zone.classList.remove('drag-over');
+        });
+      });
+
+      zone.addEventListener('drop', (e) => {
+        if (e.dataTransfer && e.dataTransfer.files) {
+          processUploadedFiles(e.dataTransfer.files);
+        }
+      });
+    }
+
+    /* -------------------- LIGHTBOX TELA CHEIA -------------------- */
+    function openLightbox() {
+      const src = resolvedPhotoSrc[carouselIdx];
+      if (!src) return;
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightboxBadge').textContent = `Foto ${carouselIdx + 1} / ${fieldPhotos.length}`;
+      document.getElementById('lightboxCaption').textContent = fieldPhotos[carouselIdx].caption;
+      document.getElementById('lightboxOverlay').classList.add('open');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightboxOverlay').classList.remove('open');
+    }
+
+    function stepLightbox(dir) {
+      for (let step = 1; step <= fieldPhotos.length; step++) {
+        const nextIdx = (carouselIdx + dir * step + fieldPhotos.length) % fieldPhotos.length;
+        if (resolvedPhotoSrc[nextIdx]) {
+          carouselIdx = nextIdx;
+          updateCarouselUI();
+          openLightbox();
+          return;
+        }
+      }
+    }
+
+    /* -------------------- CONTROLES DE TECLADO & SWIPE TOUCH -------------------- */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        closeDispatchModal();
+        document.getElementById('indexOverlay').classList.remove('open');
+        return;
+      }
+
+      if (document.getElementById('lightboxOverlay').classList.contains('open')) {
+        if (e.key === 'ArrowRight') stepLightbox(1);
+        if (e.key === 'ArrowLeft') stepLightbox(-1);
+        return;
+      }
+
+      if (e.key === 'ArrowRight' || (e.key === ' ' && document.activeElement.tagName !== 'BUTTON')) {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      } else if (e.key.toLowerCase() === 'n') {
+        toggleNotes();
+      } else if (e.key.toLowerCase() === 'm') {
+        toggleIndexModal();
+      }
+    });
+
+    // Swipe touch para navegar entre slides (ou no carrossel se o toque for dentro dele)
+    let touchStartX = 0;
+    let touchTargetInCarousel = false;
+
+    document.getElementById('stage').addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchTargetInCarousel = Boolean(e.target.closest('#carouselViewport'));
+    }, { passive: true });
+
+    document.getElementById('stage').addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(dx) > 55) {
+        if (touchTargetInCarousel && currentSlide === 4) {
+          dx < 0 ? stepCarousel(1) : stepCarousel(-1);
+        } else {
+          dx < 0 ? nextSlide() : prevSlide();
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
